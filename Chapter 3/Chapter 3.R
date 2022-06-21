@@ -65,3 +65,183 @@ filter(flights, month == 1, day == 1)
 
 # 3. We would expect that dep_delay is the difference between the actual dep_time
 # and the scheduled departure time.
+
+# 4. mutate(flights, ranking = omit.na(min_rank(dep_delay)))
+
+# 5. 1:3+1:10 returns an error because the 3 length sequence cannot evenly be
+# added to the 10 length sequence.
+
+# 6. cos,sin,tan,acos,asin,atan,atan2,cospi,sinpi,tanpi.
+# a'x' gives arc'tan'x'
+
+### Grouped summaries with summarize()
+
+# Excercises
+
+# 1. Arrival delay is likely more important most of the time, since most
+# passengers likely schedule their days based on their arrival times. More
+# so however would be whether factors affecting arrival delays or factors
+# affecting departure delay contribute more towards "total delays", since clearly
+# a plane that left late is more likely to not arrive on scheduled time then a plane
+# that left on time, likewise a plane arriving late with likely depart later for
+# its next flight. This depends on how airlines manage multiple flights for
+# individual planes.
+
+# for example p <- not_cancelled %>% group_by(tailnum,origin,dest) %>%
+#summarize(count = n(), arr_delay_10 = min(arr_delay >= 10))
+
+#p %>% filter(count>5, arr_delay_10>0)
+
+# shows that there are exactly 6 flights which have flown more then 5 times
+# and been delayed on arrival more then 10 minutes every time. While it may seem
+# that variance in delays like 50% of the time being early or 50% of the time being
+# late, it seems that consistent delays, point to a procedural problem and airline
+# could actually solve, whereas variant delays, may be more inclined to be due to things
+# outside of an airlines control, like areas with highly variant whether patterns.
+
+# a plane that almost always is 10min delayed, either means the expected times 
+# in the schedule need to be altered, or something very wrong is happening
+
+# 2. not_cancelled %>% group_by(dest) %>% summarize(Flights = n())
+# not_cancelled %>% group_by(tailnum) %>% summarize( n = sum(distance))
+
+# 3. A flight that needs to make emergency landing in the middle of flight would
+# not be considered cancelled in this case because of the "or" statement. The 
+# flight would have departed but never arrived. Instead it probably should only
+# include flights which never depart.
+
+# 4. cancelled <- flights %>% 
+# mutate(cancelled = (is.na(dep_delay)) | is.na(arr_delay)) %>%
+# group_by(year, month, day) %>%
+# summarize(Cancelled_total = sum(cancelled)+
+# ,Total = n(), avg_delay = sum(arr_delay, na.rm = T)/n())
+
+# We end up seeing a positive correlation between the avg_delay and the 
+# proportion of cancelled flights. This intuitively makes sense since as the 
+# average delay climbs some flights will approach a cut off where an airline
+# must start cancelling flights which can no longer reasonably depart on time.
+
+# 5. Depending on how you define the worst delays
+
+#not_cancelled %>%
+#group_by(carrier) %>%
+#summarize(avg_delay = sum(arr_delay)/n()+
+#, largest = max(arr_delay), smallest = min(arr_delay))
+
+# this gives the avg_delay and the worst delays as well as the smallest or most
+# ahead of schedule.
+
+# by this is seems on average the worst carrier is F9, Frontier Airlines, Inc
+# but the largest delay was from HA, Hawaiian Airlines Inc. 
+
+# The problem with trying to distinguish carrier from airport is that not all 
+# carriers fly out of every airport, and even more not all carriers go to every 
+# destination
+
+#flights %>%
+#group_by(carrier) %>%
+#summarize(unique_destinations = length(unique(dest)))
+
+# So you can't really compare them, the best you can do is filter the ones that
+# go to the same destinations, flying out of the same locations.
+# but Alaska airlines for example, only flies to Seattle in this dataset, so it
+# can't realistically be compared to anyone else except in that narrow flight path
+
+# 6. 
+#y <- not_cancelled %>%
+  #group_by(tailnum) %>%
+  #arrange(tailnum,year,month,day,dep_time,dep_delay) %>%
+  #select(tailnum, year,month,day,dep_time,dep_delay) %>%
+  #filter(cumall(dep_delay >= 60)) %>%
+  #tally()
+
+# 7. The sort argument sorts the groups by largest to smallest count. Say you 
+# want to count the number of flights per day and then find the busiest flying days
+# not_cancelled %>% group_by(year,month,day)%>% count(sort =T)
+
+### Grouped Mutates
+
+#Excercises
+# 1. The arithmetic functions like +, - , /, are unaffected. But summary functions
+# like mean, and median, operate within the group. Similary, ranking is ranked 
+# relative to the group
+
+# 2.
+not_cancelled %>%
+  group_by(tailnum) %>%
+  mutate(worst_performer = sum(arr_delay)/n()) %>%
+  select(tailnum, worst_performer)%>%
+  arrange(desc(worst_performer))%>%
+  filter(n()>10)%>%distinct(tailnum, .keep_all = T)
+
+# returns the average arrival delay of planes that have flown more then 10 times.
+# sorted by largest to smallest average delay times
+
+# 3. 
+not_cancelled %>%
+  group_by(hour) %>%
+  mutate(avg_delay = sum(arr_delay)/n()) %>%
+  select(hour,avg_delay)%>% distinct(hour, .keep_all = T)%>%
+  arrange(desc(avg_delay))
+
+# shows that 7am is the hour with the lowest average delay.
+
+# 4. 
+not_cancelled %>%
+  filter(arr_delay > 0) %>%
+  group_by(dest) %>%
+  summarize(delay_total = sum(arr_delay), proportion_delay = arr_delay/sum(arr_delay))
+
+# 5.
+p <- not_cancelled %>%
+  arrange(origin,year,month,day,dep_time) %>%
+  group_by(origin) %>%
+  mutate(lagged_dep_delay = lag(dep_delay)) %>%
+  select(origin,year,month,day,dep_time,dep_delay,lagged_dep_delay,dest) %>%
+  filter(origin == "EWR")
+
+ggplot(p)+geom_point(mapping = aes(x = lagged_dep_delay, y = dep_delay))
+
+# 6.
+flights %>%
+  filter(!is.na(dep_delay) & !is.na(arr_delay)) %>%
+  group_by(dest,origin) %>%
+  mutate(avg_air_time = mean(air_time),number_flights = n())%>%
+  select(tailnum,origin,dest,air_time,avg_air_time, number_flights)%>%
+  mutate(rank = air_time/avg_air_time)%>%
+  filter(rank<=0.8)%>%
+  arrange(rank)
+
+# probably multiple ways to identify what is suspicious, this will rank flights
+# by how much air_time they had relative to the average flights from that origin
+# to the same destination. Listed are flights whose air_time was less then 0.8 
+# of the average flight time. A suspicious flight could also be one whose 
+# air_time is significantly shorter then sched_dep_time and sched_arr_time, however
+# it's likely that carriers anticipate some amount of delay, and adjust those
+# schedules based on that, and so a flight that encounters no delays may seem 
+# suspicious when it is in fact not.
+
+p<-flights %>%
+  filter(!is.na(dep_delay) & !is.na(arr_delay)) %>%
+  group_by(dest,origin) %>%
+  mutate(relative_delay = air_time-min(air_time), min_air_time = min(air_time)) %>%
+  select(tailnum,origin,dest,air_time,min_air_time,relative_delay)%>%
+  arrange(desc(relative_delay))%>%
+  ungroup%>%
+  slice(1:10)
+# the top 10 most delayed flights in the air relative to the shorters air_time flight
+
+# 7.
+flights %>%
+  filter(!is.na(dep_delay) & !is.na(arr_delay)) %>%
+  group_by(dest)%>%
+  filter(length(unique(carrier))>= 2)%>%
+  group_by(carrier)%>%
+  summarize(num_of_dest = length(unique(dest)))%>%
+  arrange(desc(num_of_dest))
+#Assuming it meant to rank them according to which carrier visits the most
+# destinations.
+
+### Workflow:Scripts
+
+#
