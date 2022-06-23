@@ -244,4 +244,59 @@ flights %>%
 
 ### Workflow:Scripts
 
+### Exploratory Data Analysis
+
+#Excercises
+
+# 1. After removing the outliers the data is 
+p <- diamonds%>% filter(y<30,z<30)
+ggplot(p)+
+  geom_freqpoly(mapping = aes(x=x),color = "blue", binwidth = 0.1)+
+  geom_freqpoly(mapping = aes(x=y),color = "red", binwidth = 0.1)+
+  geom_freqpoly(mapping = aes(x=z),color = "green", binwidth = 0.1)
+# x,y,z are all highly correlated with one another
+# > cor(diamonds$x,diamonds$y)
+#[1] 0.9747015
+#> cor(diamonds$z,diamonds$y)
+#[1] 0.9520057
 #
+
+# 2. The relation between the length of the diamond and the price, is seemingly
+# what would be expected
+
+ggplot(diamonds)+geom_point(mapping = aes(x = x, y = price))
+
+# as length increases price seemingly increases exponentially, this could be 
+# because larger cuts of diamonds require larger raw diamonds, which are rarer.
+
+ggplot(diamonds)+geom_histogram(mapping = aes(x = price), binwidth=50)+coord_cartesian(xlim = c(0,10000))
+# the distribution is similar to exponential distribution
+
+# 3.
+sum(diamonds$carat == 0.99)
+sum(diamonds$carat == 1)
+# its likely that most diamonds get rounded to common fractions of a whole diamond
+# which explains why there are 1558 1 carat diamonds but only 23 0.99 carat diamonds
+
+# 4. Most noticeable the difference between these options,
+ggplot(diamonds)+geom_smooth(mapping = aes(x = x, y = price))+
+  coord_cartesian(ylim = c(0,10000))
+
+ggplot(diamonds)+geom_smooth(mapping = aes(x = x, y = price))+ylim(0,10000)
+
+# in the second the ylim removes all data above 10000, whereas the first with
+# coord_cartesian() is a true zoom.
+# default binwidth is 30 when left undefined.
+
+# Missing Values
+
+#Excercises
+
+# 1. In geom_histogram, the NA values are removed with the warning 
+# Warning message:
+#Removed 2 rows containing non-finite values (stat_count).
+# in geom_bar, NA will be treated as a separate category
+
+# 2. na.rm removes NA values from mean() and sum()
+
+### Covariation
