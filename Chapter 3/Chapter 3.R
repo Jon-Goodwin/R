@@ -300,3 +300,27 @@ ggplot(diamonds)+geom_smooth(mapping = aes(x = x, y = price))+ylim(0,10000)
 # 2. na.rm removes NA values from mean() and sum()
 
 ### Covariation
+
+# Excercises
+
+# 1. 
+flights %>% mutate(cancelled = is.na(dep_time)) %>%
+  ggplot(mapping = aes(sched_dep_time))+
+  geom_freqpoly(mapping = aes(color = cancelled, y = ..density..), bindwidth = 1/4)+
+  coord_cartesian(xlim = c(0,2400))
+# we see using the density argument for y in geom_freqpoly and geom_density gives
+# a kernel density estimator of the variable, a smoothed version of the histogram
+flights %>% mutate(cancelled = is.na(dep_time)) %>%
+  ggplot(mapping = aes(sched_dep_time, color = cancelled))+
+  geom_density()+
+  coord_cartesian(xlim = c(0,2400))
+
+# 2. Lower cut quality diamonds have higher median carat then higher quality diamonds.
+# higher carat is the most highly correlated variable with price
+cor.test(diamonds$carat,diamonds$price)
+diamonds %>%ggplot(aes(cut,price))+geom_boxplot()
+diamonds %>%
+  ggplot(aes(cut,carat))+
+  geom_boxplot()
+
+# 3. 
