@@ -324,3 +324,26 @@ diamonds %>%
   geom_boxplot()
 
 # 3. 
+ggplot(diamonds)+geom_boxploth(mapping = aes(y= cut, x = price))
+ggplot(diamonds)+geom_boxplot(mapping = aes(x= cut, y = price))+coord_flip()
+# both plots are the same
+
+# 4. geom_lv is better for visualizing data sets with large amounts of data
+# since those data are more likely to have long tails of outliers
+ggplot(diamonds)+geom_lv(mapping = aes(x= cut, y = price), k = 2)
+
+# 5. 
+ggplot(diamonds)+geom_freqpoly(mapping = aes(x = price, color = cut))
+ggplot(diamonds)+
+  geom_histogram(mapping = aes(x = price))+facet_grid(~cut, scale = "free_y")
+ggplot(diamonds)+geom_violin(mapping = aes(x = cut, y = price))
+# The geom_freqpoly method it becomes difficult to see any differences between
+# the groups at the tails. The geom_histogram method makes it easier to compare but
+# even with 5 groups it compresses the tables quite a bit. The geom_violin
+# method seems the best in this scenario though it becomes somewhat more difficult
+# to distinguish the distributions
+
+# 6. 
+
+### Two categorical variables
+
