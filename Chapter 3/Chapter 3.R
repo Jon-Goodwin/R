@@ -347,3 +347,63 @@ ggplot(diamonds)+geom_violin(mapping = aes(x = cut, y = price))
 
 ### Two categorical variables
 
+# Exercises
+
+# 1. 
+p <- diamonds %>% count(color,cut) %>% 
+  group_by(color) %>% 
+  mutate(Percent = n/sum(n))
+
+p %>% 
+  ggplot(mapping = aes(x = color, y = cut)) +
+  geom_tile(mapping = aes(fill = Percent))+coord_flip()
+
+# This gives the proportion of each cut for a particular color. This reveals
+# more clearly that the largest propotion of diamonds in each color group are 
+# ideal diamonds.
+
+# 2. 
+f <- flights %>% 
+  filter(!is.na(dep_delay) & !is.na(arr_delay),dep_delay>0) %>%
+  group_by(month, dest) %>%
+  summarize(dep_del = mean(dep_delay))
+f%>%ggplot(mapping = aes(x = factor(month), y = fct_reorder(dest, dep_del), fill = dep_del))+
+  geom_tile()+scale_fill_viridis()
+# There are far too many destinations to make this plot legible.
+
+# 3.
+diamonds %>%
+  count(color, cut) %>%
+  ggplot(mapping = aes(x = color, y = cut)) +
+  geom_tile(mapping = aes(fill = n))
+
+diamonds %>%
+  count(color, cut) %>%
+  ggplot(mapping = aes(y = color, x = cut)) +
+  geom_tile(mapping = aes(fill = n))
+# Using x = cut is slightly better because cut has a more natural ordering then
+# colors, also there's a wider spread of results within the colors then within 
+# the cuts, and reading left to right is more natural.
+
+
+# Two continuous Variables
+
+# Excercises
+
+# 1. 
+ggplot(data = smaller, mapping = aes(x = price, color =  cut_width(carat, 0.7)))+
+  geom_freqpoly()
+
+ggplot(data = smaller, mapping = aes(x = price, color =  cut_number(carat, 5)))+
+  geom_freqpoly()
+
+# Both cut_width() and cut_number() are effectively accomplishing the same
+# visualization, above I found that cut_width(carat, 0.7) creates 5 different
+# groups for carat
+
+# 2. 
+
+ggplot(data = smaller, mapping = aes(x = carat, color =  cut_number(price, 5)))+
+  geom_freqpoly()
+
+# splitting into 5 price 
