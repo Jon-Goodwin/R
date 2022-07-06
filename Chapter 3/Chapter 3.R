@@ -406,4 +406,29 @@ ggplot(data = smaller, mapping = aes(x = price, color =  cut_number(carat, 5)))+
 ggplot(data = smaller, mapping = aes(x = carat, color =  cut_number(price, 5)))+
   geom_freqpoly()
 
-# splitting into 5 price 
+# splitting into 5 price groups, and we easily see that the carat size
+# increase is associated with the price.
+
+# 3. The distribution of price amongst the diamonds is as we would expect, higher
+# priced diamonds are typically larger.
+
+# 4.
+
+ggplot(data = smaller) +
+  geom_bin2d(mapping = aes(x = carat, y = price))+facet_wrap(~cut)
+
+ggplot(data = smaller, mapping = aes(x = cut_number(carat,4), y = price)) +
+  geom_boxplot(mapping = aes(color = cut))
+
+# 5. 
+
+ggplot(data = diamonds)+geom_bin2d(mapping = aes(x = x, y = y))+
+  coord_cartesian(xlim = c(4, 11), ylim = c(4, 11))
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = x, y = y))+
+  coord_cartesian(xlim = c(4, 11), ylim = c(4, 11))
+
+# the binned plot masks the outliers since the plane has been partitioned into
+# larger chunks making outliers difficult to detect.
+
+###
