@@ -223,3 +223,31 @@ preg <- preg %>%
   rename(Pregnant = pregnant)
 
 ### Separating and Pulling
+
+#Excercises
+
+# 1.
+tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>%
+  separate(x, c("one", "two", "three"), extra = "merge")
+
+tibble(x = c("a,b,c", "d,e", "f,g,i")) %>%
+  separate(x, c("one", "two", "three"), fill = "warn")
+
+# 2. 
+
+# With separate when remove() is FALSE the separate function will not remove the
+# column being separated.
+tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>%
+  separate(x, c("one", "two", "three"), remove = F)
+
+# With remove() FALSE in unite() the united columns are not removed.
+table5 %>%
+  unite(new, century, year, sep = "", remove = F)
+
+# 3.
+# Unite has only one variation because there's only 1 way to combine things but many
+# ways a column could be separated.
+
+
+### Missing Values
+
