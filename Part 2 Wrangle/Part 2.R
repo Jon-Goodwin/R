@@ -219,7 +219,7 @@ preg <- tribble(
   "no", 20, 12
 )
 preg <- preg %>%
-  gather(Gender, Count, male, female,) %>%
+  gather(Gender, Count, male, female) %>%
   rename(Pregnant = pregnant)
 
 ### Separating and Pulling
@@ -251,3 +251,92 @@ table5 %>%
 
 ### Missing Values
 
+# Excercises
+
+# 1. 
+# Fill only has a data and direction argument.
+# Complete has only the columns to expand as and argument, the fill argument
+# which gives a list of values to use instead of NA and explicit which is T/F 
+# depending on whether to use fill for existing NA values or not.
+
+# 2.
+# direction changes the direction of the fill, example
+treatment %>%
+  fill(person, .direction = "up")
+
+### Case Study
+
+who3 <- who %>%
+  gather(code, value, new_sp_m014:newrel_f65, na.rm = TRUE) %>%
+  mutate(
+    code = stringr::str_replace(code, "newrel", "new_rel")
+  ) %>%
+  separate(code, c("new", "var", "sexage")) %>%
+  select(-new, -iso2, -iso3) %>%
+  separate(sexage, c("sex", "age"), sep = 1)
+
+# 1. If there are no 0 entries it would be reasonable to assume NA is a substitute
+# for 0 cases, however:
+
+length(which(who == 0))
+
+# returns 11080 so there are 11080, entries of 0. So it would be reasonable to assume
+# NA means no data and is an explicit missing value.
+
+dim(who)[1]
+
+who %>% complete(year,country)%>% nrow()
+
+# we see that there are 7446 possible pairings of countries and years in the table
+# but only 7240 entries are present.
+
+who.complete <- who %>% complete(year,country)
+
+who.missing <- who.complete %>% 
+  anti_join(who) %>%
+  select(country,year)
+
+# this tibble contains all country, year pairings that did not appear in the original
+# who tibble.
+
+# 2.
+test <- who %>%
+  gather(code, value, new_sp_m014:newrel_f65, na.rm = TRUE) %>%
+  separate(code, c("new", "var", "sexage"))
+
+# there are no longer 3 separators in code so separate fills the inconsistently 
+# entered newrel instead the first 2 columns are filled by the separator and the
+# last column "sexage" is filled as NA
+
+which(is.na(test$sexage) == T)
+
+# 3.
+who %>%
+  select(country,iso2,iso3) %>%
+  group_by(country) %>%
+  distinct()%>%
+  filter(n() > 1)
+
+# shows there are no countries with more then 1 combination of iso2, iso3. Thus
+# the iso2 and iso3 columns are redundant.
+
+# 4.
+who3 %>%
+  group_by(country,year,sex) %>%
+  summarize(count = sum(value)) %>%
+  unite(country_sex, country, sex, remove = F) %>%
+  filter(year > 1995) %>%
+  ggplot(aes(year,count, group = country_sex, color = sex)) + 
+  geom_line()
+
+who3 %>%
+  group_by(country,year,sex) %>%
+  summarize(count = sum(value)) %>%
+  unite(country_sex, country, sex, remove = F) %>%
+  filter(year > 1995) %>%
+  arrange(-count) %>%
+  filter(count > 100000) %>%
+  ggplot(aes(year,count, group = country_sex, color = sex)) + 
+  geom_line()
+
+### Relational Data with dplyr
