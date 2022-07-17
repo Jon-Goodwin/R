@@ -340,3 +340,37 @@ who3 %>%
   geom_line()
 
 ### Relational Data with dplyr
+
+# Excercises
+
+# 1. The airports table contains the lattitude and longitude of all airports.
+# the flights table contains the tailnum of the plane and the origin and dest of
+# each of its scheduled flights. So we would combine airports with flights
+# and then take the origin, dest, longitude, lattitude, tailnum variables.
+
+# 2. faa from airports is the origin in weather
+
+# 3. Weather would contain the weather information for the destination
+
+# 4. A "Special Dates" table would contain year,month,day, and maybe a name for
+# day.
+
+# Keys
+
+# Excercises
+
+# 1. 
+flights %>%
+  arrange(year,month,day,flight) %>%
+  mutate(id = row_number())
+
+# 2. 
+Batting %>%
+  group_by(playerID,yearID, stint) %>%
+  mutate(n = n()) %>%
+  filter(n>1)
+# The primary key is playerID, yearID, stint
+
+babynames %>%
+  count(year,sex,name) %>%
+  filter(n>1)
