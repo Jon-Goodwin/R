@@ -564,3 +564,57 @@ flights %>%
 
 ### Strings with stringr
 
+# Excercises:
+
+# 1. paste() you can specify the sep argument, where paste0 just uses sep = ""
+# str_c, is the equivalent stringr function, but paste() prints NA as "NA" by 
+# default
+
+# 2.
+str_length(str_c(c("x", "y", "z"), collapse = ", "))
+
+str_length(str_c(c("x", "y", "z"), sep = ", "))
+
+# sep is a separator str_c combines vectors, collapse, collapses a vector to a
+# single string.
+
+# 3.
+
+x <- "Number"
+
+y <- str_length(x)/2
+
+str_sub(x, if (str_length(x) %% 2 != 0) {ceiling(y)}
+        else {str_length(x)/2},
+        if (str_length(x) %% 2 != 0) {ceiling(y)}
+        else {str_length(x)/2})
+
+# 4.
+str_wrap() # a line wrapping algorithm to fit a string into a specific line
+# format, useful to reformat text to fit on a page
+
+# 5. str_trim() removes the whitespace at the start and end of a string
+
+x <- " example "
+x.trim <- str_trim(x)
+
+# str_pad() adds whitespace
+
+str_pad("example", 9, side = c("both"))
+
+# 6.
+z <- c("eggs","lettuce", "apples", "oranges")
+if (length(z) == 1) {z} else {str_c(c(str_c(z[-length(z)],
+                                            collapse = ", "), z[length(z)]),
+                                    collapse = ", and ")}
+
+# Im not sure if for example:
+
+z.2 <- c("eggs", "lettuce")
+if (length(z.2) == 1) {z.2} else if (length(z.2) == 2) {str_c(z.2,
+                                    collapse = " and ")} else {
+                                    str_c(c(str_c(z.2[-length(z.2)],
+                                    collapse = ", "), z.2[length(z.2)]),
+                                    collapse = ", and ")}
+# would be better
+
