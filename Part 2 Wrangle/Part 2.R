@@ -374,3 +374,193 @@ Batting %>%
 babynames %>%
   count(year,sex,name) %>%
   filter(n>1)
+# The primary key is year,sex,name
+
+atmos %>%
+  count(lat,long, year, month) %>%
+  filter(n>1)
+
+vehicles %>%
+  count(id) %>%
+  filter(n>1)
+
+diamonds %>%
+  count(x,y,z, depth, table, color ,clarity, cut, carat, price, color) %>%
+  filter(n>1)
+
+#All variables are a primary key.
+
+# 3.
+
+### Mutating Joins
+
+# 1. 
+airports %>%
+  semi_join(flights, c("faa" = "dest")) %>%
+  ggplot(aes(lon, lat)) +
+  borders("state") +
+  geom_point() +
+  coord_quickmap()
+
+flights3 <-
+  flights %>%
+  filter(!is.na(dep_delay) & !is.na(arr_delay)) %>%
+  group_by(dest) %>%
+  summarize(avg_delay = mean(arr_delay, na.rm = T))
+
+flights3 %>% left_join(airports, c("dest" = "faa")) %>%
+  ggplot(aes(lon,lat)) +
+  borders("state") +
+  geom_point(aes(size = avg_delay)) +
+  coord_quickmap()
+
+# 2.
+
+flights2 %>% 
+  left_join(airports, c("dest" = "faa")) %>%
+  rename(lat.dest = lat, lon.dest = lon) %>%
+  left_join(airports, c("origin" = "faa")) %>%
+  rename(lat.origin = lat, lon.origin = lon) %>%
+  select(year,month,day,hour, origin, lat.origin, lon.origin, dest, lat.dest,lon.dest,
+         tailnum, carrier)
+
+# 3.
+planes.age <- planes %>%
+  select(year, tailnum) %>%
+  rename(man.date = year)
+
+flights.age <- flights %>%
+  left_join(planes.age, "tailnum") %>%
+  mutate(age = year-man.date) %>%
+  select(dep_delay, age,) %>%
+  filter(!is.na(dep_delay) & !is.na(age)) %>%
+  group_by(age) %>%
+  mutate(avg_delay = mean(dep_delay)) %>%
+  ggplot(aes(x = age, y = avg_delay))+
+  geom_point()
+
+# there doesn't seem to be any strong relationship between the manufacture date
+# of a plane and the delays. Early on in a planes life they seem to increase but
+# then fall off.
+
+# 4. 
+
+flights.weather <- flights %>%
+  left_join(weather, by = c("origin","year","month","day","hour")) %>%
+  filter(!is.na(dep_delay) & !is.na(wind_speed)) %>%
+  group_by(wind_speed) %>%
+  summarize(avg_delay = mean(dep_delay)) %>%
+  ggplot(aes(x = wind_speed, y = avg_delay))+
+  geom_point()
+
+#we notice a rather strong correlation between wind speed and dep delays.
+
+# 5.
+
+flights.june <-
+  flights %>%
+  filter(year == 2013, month == 6, day == 13, !is.na(arr_delay)) %>%
+  group_by(dest) %>%
+  summarize(avg_delay = mean(arr_delay)) %>%
+  left_join(airports, c("dest" = "faa")) %>%
+  ggplot(aes(lon,lat)) +
+  borders("state") +
+  geom_point(aes(size = avg_delay, color = avg_delay)) +
+  coord_quickmap()
+
+# 900 flights were canceled due to strong storms on the east coast.
+
+### Filtering Joins
+
+# 1. 
+f1 <- flights %>%
+  anti_join(planes, by = "tailnum") %>%
+  group_by(carrier) %>%
+  summarize(count = n()) %>%
+  arrange(-count)
+
+# From the documentation for plaens "American Airways (AA) and Envoy Air (MQ) 
+# report fleet numbers rather than tail numbers so can't be matched."
+
+flights %>%
+  filter(carrier == 'AA' | carrier == 'MQ') %>%
+  group_by(carrier) %>%
+  summarize(count = n()) %>%
+  arrange(-count)
+
+# We see these airlines do have some planes with tailnumbers however, and its
+# not clear why the other carriers have some planes with unregistered tailnumbers.
+
+# 2. 
+flights %>%
+  filter(!is.na(tailnum)) %>%
+  group_by(tailnum) %>%
+  mutate(count = n()) %>%
+  filter(count >= 100)
+
+# 3. 
+
+vehicles %>%
+  semi_join(common)
+
+# 4.
+
+# The easiest interpretation here is finding the "worst" 48 hours of the year.
+# worst being interpreted as the hour with the largest total dep_delay.
+
+flight.48 <- 
+  flights %>%
+  filter(!is.na(dep_delay) & !is.na(arr_delay)) %>%
+  group_by(year,month,day,hour) %>%
+  summarize(delay = sum(dep_delay, na.rm = T)) %>%
+  ungroup() %>%
+  arrange(-delay) %>%
+  head(48)
+
+weather %>%
+  summarize(avg_visib = mean(visib, na.rm = T), avg_wind_speed = mean(wind_speed,
+                                                                      na.rm = T),
+            avg_precip = mean(precip, na.rm = T))
+
+# My expectation is that visibility on the most delayed hours will be lower then
+# average and wind speed will be higher.
+
+weather %>%
+  semi_join(flight.48) %>%
+  summarize(avg_visib = mean(visib, na.rm = T), avg_wind_speed = mean(wind_speed,
+                                                                      na.rm = T),
+            avg_precip = mean(precip, na.rm = T))
+
+# We get what was expected, the weather patterns associated with higher delays were
+# more prevalent during those worst delayed hours.
+
+# 5.
+anti_join(flights, airports, by = c("dest" =
+                                      "faa")) %>%
+  select(dest) %>%
+  unique()
+
+# this tells us the airports in flights not listed in airports. There are 4
+# BQN, SJU, STT, PSE, which all appear to be in puerto rico or the virgin islands.
+
+anti_join(airports, flights,
+          by = c("faa" = "dest")) %>%
+  select(faa) %>%
+  unique()
+
+# These are all the domestic airports which were not flown to from NYC in 2013.
+
+# 6.
+flights %>%
+  filter(!is.na(tailnum)) %>%
+  select(tailnum, carrier) %>%
+  unique() %>%
+  group_by(tailnum) %>%
+  count() %>%
+  filter(n>1)
+
+# So the assumption that each plane has only flown with 1 carrier is not true,
+# though it seems reasonable that carrier may buy and sell planes among eachother
+
+### Strings with stringr
+
