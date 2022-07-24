@@ -618,3 +618,119 @@ if (length(z.2) == 1) {z.2} else if (length(z.2) == 2) {str_c(z.2,
                                     collapse = ", and ")}
 # would be better
 
+### Matching Pattersn with regular Expressions
+
+# Excercises
+
+# 1.
+# Every \ escapes the next character so "\" expects a another character after \
+# in this case it escapes " but then the string is left open
+
+# "\\" in the regular expression this gives \ which is used as the escape character
+# so effectively the string "\\" is the escape regular expression
+
+# "\\\" \\ is a metacharacter in the regular expression, which needs to be escaped
+# via a \ but then that resolves to escaping a character. thus the need for an 
+# additional \, to resolve to a literal \.
+
+# 2.
+x <- "\"\'\\"
+str_view(x, "\\\"\\\'\\\\")
+
+# 3.
+
+# The expression will match the sequence, literal ." character" literal ." character"
+# literal ." character"
+
+### Anchors
+
+# 1. 
+
+str_view("$^$", "\\$\\^\\$")
+
+# 2.
+
+str_view(stringr::words, "^y", match = T)
+
+str_view(stringr::words, "x$", match = T)
+
+str_view(stringr::words, "^...$", match = T)
+
+str_view(stringr::words, ".......", match = T)
+
+### Characater classes and alternatives
+
+# 1.
+
+str_view(stringr::words, "^[aeiou]", match = T)
+
+str_view(stringr::words, "[aeiou]", match = F)
+
+str_view(stringr::words, "[^e]ed$", match = T)
+
+str_view(stringr::words, "ing$|ize$", match = T)
+
+# 2.
+
+str_view(stringr::words, "[c]ei|[^c]ie", match = T)
+
+str_view(stringr::words, "cie|[^c]ei", match = T)
+
+# three words violate the rule.
+
+# 3.
+
+str_view(stringr::words, "q[^u]", match = T)
+
+# yes, there are no words that have a character other then u after q
+
+# 4.
+
+str_view(stringr::words, "ou|ise$", match = T)
+
+# will capture any british spelling but also common words like group
+# however flavour instead of flavor is british spelling
+
+# 5.
+x <- c("226-567-5678", "2222222222", "519-564-4665")
+
+str_view(x, "\\d\\d\\d-\\d\\d\\d-\\d\\d\\d\\d", match = T)
+
+### Repetitions
+
+# 1.
+
+x <- "1888 is the longest year in Roman numerals: MDCCCLXXXVIII"
+
+str_view(x, "CC{0,1}")
+
+str_view(x, "CC{1,}")
+
+str_view(x, "CC{0,}")
+str_view(x, "CC*")
+
+# 2.
+
+# ^.*$ any character repeated 0 or more times, regular expression for entire line
+
+# "\\{.+\\}" any string that contains literal { and } with any characters in between
+# string that defines a reg exp
+
+# \d{4}-\d{2}-\d{2} any digit 4 times - any digit 2 times - any digit 2 times
+
+# "\\\\{4}" literal \ repeated 4 times, string that defines a regular exp
+
+str_view("\\\\\\\\\\", "\\\\{4}")
+
+# 3.
+
+str_view(stringr::words, "^[^aeiou]{3}", match = T)
+
+str_view(stringr::words, "[aeiou]{3,}", match = T)
+
+str_view(stringr::words, "([aeiou][^aeiou]){2,}", match = T)
+
+# 4. yes.
+
+### Grouping and Backreferences
+
