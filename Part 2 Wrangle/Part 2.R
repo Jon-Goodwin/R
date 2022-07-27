@@ -734,3 +734,90 @@ str_view(stringr::words, "([aeiou][^aeiou]){2,}", match = T)
 
 ### Grouping and Backreferences
 
+# Excercises
+
+# 1.
+# (.)\1\1 regexp matching any character repeated 3 times
+str_view(c(fruit, "aaaa"), "(.)\\1\\1", match = T)
+
+# "(.)(.)\\2\\1" a string with any 2 characters, and then the second character
+# repeats followed by the first.
+str_view(c("abba", "cddc", "dcdc", "ccdd"), "(.)(.)\\2\\1", match = T)
+
+# (..)\1 group of any 2 characters repeats once
+
+str_view(stringr::words, "(..)\\1", match = T)
+
+# "(.).\\1.\\1" any character then any character  then first character then any
+# then first again
+
+str_view("aoaka", "(.).\\1.\\1")
+
+# "(.)(.)(.).*\\3\\2\\1" any character any character any character any character
+# 0 or more times, then repeat third, repeat second, repeat first
+
+str_view("abcooocba", "(.)(.)(.).*\\3\\2\\1")
+
+# 2.
+
+str_view(stringr::words, "^(.).*\\1$", match = T)
+
+str_view(stringr::words, "(.)(.).*\\1\\2", match = T)
+
+str_view("bcdcedc", "(.).*\\1.*\\1.*", match = T)
+
+### Tools
+
+# Excercise
+
+# 1.
+
+words[str_detect(words, "^x|x$")]
+
+start <- str_detect(words, "^x")
+end <- str_detect(words, "x$")
+words[start|end] == words[str_detect(words, "^x|x$")]
+#
+words[str_detect(words, "^[aeiou].*[^aeiou]$")]
+
+start_vowel <- str_detect(words, "^[aeiou]")
+end_consonant <- str_detect(words, "[^aeiou]$")
+words[start_vowel & end_consonant]
+#
+a <- str_detect(words, "a+")
+
+e <- str_detect(words, "e+")
+
+i <- str_detect(words, "i+")
+
+o <- str_detect(words, "o+")
+
+u <- str_detect(words, "u+")
+
+words[a&e&i&o&u]
+#
+str_count(words, "[aeiou]")
+df %>%
+  mutate(vowels = str_count(words, "[aeiou]"), length = str_count(words, "."),
+         prop = vowels/length) %>%
+  arrange(-prop)
+# a has the highest proportion of vowels.
+
+### Extract Matches
+
+# Excercises
+
+# 1.
+color_match <- "\\bred\\b|\\borange\\b|\\byellow\\b|\\bgreen\\b|\\bblue\\b|\\bpurple\\b"
+has_color <- str_subset(sentences, color_match)
+matches <- str_extract(has_color, color_match)
+more <- sentences[str_count(sentences, color_match) > 1]
+str_view_all(more, color_match)
+#
+str_extract(sentences, "[A-Z][a-z]*")
+str_extract(str_subset(sentences, "[A-Za-z][a-z]*ing"), "[A-Za-z][a-z]*ing")
+#
+str_subset(sentences, "[A-Za-z][a-z]{2,}s\\b")
+str_extract(str_subset(sentences, "[A-Za-z][a-z]{2,}s\\b"), "[A-Za-z][a-z]{2,}s\\b")
+# identifies some but many false positives.
+
