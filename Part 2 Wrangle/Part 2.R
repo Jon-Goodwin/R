@@ -814,10 +814,71 @@ matches <- str_extract(has_color, color_match)
 more <- sentences[str_count(sentences, color_match) > 1]
 str_view_all(more, color_match)
 #
+
+# 2.
 str_extract(sentences, "[A-Z][a-z]*")
+#
 str_extract(str_subset(sentences, "[A-Za-z][a-z]*ing"), "[A-Za-z][a-z]*ing")
 #
 str_subset(sentences, "[A-Za-z][a-z]{2,}s\\b")
 str_extract(str_subset(sentences, "[A-Za-z][a-z]{2,}s\\b"), "[A-Za-z][a-z]{2,}s\\b")
 # identifies some but many false positives.
+
+### Grouped Matches
+
+# Excercises 
+
+# 1.
+
+number <- "(one|two|three|four|five|six|seven|eight|ten|eleven) ([^ ]+)"
+
+has_number <- sentences %>%
+  str_subset(number) %>%
+  head(10)
+
+has_number %>%
+  str_extract(number)
+
+# 2.
+
+contraction <- "([^ ]+)(')([^ ]+)"
+has_contraction <-
+  sentences %>%
+  str_subset(contraction)
+
+has_contraction %>%
+  str_match_all(contraction)
+#
+
+### Replacing Matches
+
+# Excercises
+
+# 1.
+str_replace_all("2020/08/28", "/", "\\\\")
+
+# 2.
+str_replace_all("ABSDCD", "[A-Z]", tolower)
+
+# 3.
+
+words[str_replace(words, "(^.)(.*)(.$)", "\\3\\2\\1") %in% words]
+
+### Splitting
+
+# Excercises
+
+# 1. 
+
+str_split("apples, pears, and bananas", boundary("word"))
+
+# 2.
+
+# boundary("word") is more general, " " would not split for instance apple,pear
+# surrounding whitespace does not necessarily indicate a word either " 1 " is a 
+# digit
+
+### Find Matches
+
+### Other Types of Patterns
 
