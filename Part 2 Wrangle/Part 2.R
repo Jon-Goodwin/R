@@ -882,3 +882,34 @@ str_split("apples, pears, and bananas", boundary("word"))
 
 ### Other Types of Patterns
 
+# Excercises
+
+# 1.
+str_detect("\\", regex("\\\\"))
+str_detect("\\", fixed("\\"))
+
+# 2.
+df <- sentences %>%
+  str_extract_all(boundary("word")) %>%
+  unlist() %>%
+  tibble() %>%
+  mutate(Str = str_to_lower(.)) %>%
+  group_by(Str) %>%
+  count() %>%
+  arrange(-n) %>%
+  head(5)
+
+### Other uses of Regular Expressions
+
+# 1.
+stri_count_words(sentences)
+#
+stri_duplicated(c("any", "many", "any", "b", "b", "b"))
+#
+stri_rand_strings(3, 5,"[A-Z]")
+#
+# 2.
+# stri_sort takes a locale argument or through stri_opts_collator()
+
+### Factors with forcats
+
