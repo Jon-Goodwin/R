@@ -913,3 +913,140 @@ stri_rand_strings(3, 5,"[A-Z]")
 
 ### Factors with forcats
 
+## Creating Factors
+
+## General Social Survey
+
+# 1.
+
+ggplot(gss_cat) +
+  geom_bar(aes(rincome)) +
+  coord_flip()
+# Not applicable 
+gss_cat %>%
+  filter(!rincome %in% c("Not applicable")) %>%
+  mutate(rincome_NR = rincome %in% c("Refused", "Don't know", "No answer")) %>%
+  ggplot() +
+  geom_bar(mapping = aes(x = rincome, fill = rincome_NR)) +
+  coord_flip() +
+  theme(legend.position = "None") +
+  scale_y_continuous("Number of Responses") + 
+  scale_x_discrete("Income Range")
+
+# 2.
+gss_cat %>%
+  group_by(relig) %>%
+  count() %>%
+  arrange(-n)
+# most common religion is Protestant
+
+gss_cat %>%
+  group_by(partyid) %>%
+  count() %>%
+  arrange(-n) %>%
+  head(3)
+# independent is the most common party identification.
+
+# 3.
+
+gss_cat %>%
+  filter(!denom %in% c("No answer","Not applicable", "No denomination", "Don't know")) %>%
+  group_by(relig) %>%
+  count()
+# denom applies to protestants.
+
+gss_cat %>%
+  select(relig,denom) %>%
+  ggplot() +
+  geom_bar(aes(x = relig, fill = relig)) +
+  theme(axis.text.x=element_blank()) +
+  facet_wrap(~denom, scales = "free")
+# this visualization makes it clear, Protestant responses are the only relig with
+# a denomination other then no answer, dont know, no denomination and not applicable
+
+### Modifying Factor Order
+
+#Fixing what seems to be a typo in the text of this section
+
+by_age <- gss_cat %>%
+  filter(!is.na(age)) %>%
+  group_by(age, marital) %>%
+  count() %>%
+  group_by(age) %>%
+  mutate(prop = n / sum(n))
+
+ggplot(by_age, aes(age, prop, color = marital)) +
+  geom_line(na.rm = TRUE)
+
+ggplot(
+  by_age,
+  aes(age, prop, color = fct_reorder2(marital, age, prop))
+) +
+  geom_line() +
+  labs(color = "marital")
+
+# Excercises 
+
+# 1.
+gss_cat %>%
+  filter(!is.na(tvhours)) %>%
+  group_by(tvhours) %>%
+  count() %>%
+  arrange(-tvhours)
+# 22 people claimed to watch 24 hours of tv in a day which seems very unlikely.
+
+# a better summary of the hours of tv watched in this case is likely the median
+mean <- mean(gss_cat$tvhours, na.rm = T)
+median <- median(gss_cat$tvhours, na.rm = T)
+gss_cat %>%
+  filter(!is.na(tvhours)) %>%
+  ggplot(aes(tvhours)) +
+  geom_bar() +
+  geom_vline(aes(xintercept = mean), color = "RED") +
+  geom_vline(aes(xintercept = median), color = "BLUE")
+
+# 2.
+levels(gss_cat$marital)
+gss_cat %>%
+  ggplot(aes(x = marital)) +
+  geom_bar()
+# arbitrary somewhat grouped by marital status relation
+levels(gss_cat$race)
+gss_cat %>%
+  ggplot(aes(x = race)) +
+  geom_bar()
+# order by increasing number
+levels(gss_cat$rincome)
+gss_cat %>%
+  ggplot(aes(x = rincome)) +
+  geom_bar() +
+  theme(axis.text.x=element_text(angle = 90))
+# principled order in decreasing income level,
+# not applicable likely refers to retired persons and so is different from other
+# non responses but still should be grouped with them in front.
+levels(gss_cat$partyid)
+gss_cat %>%
+  ggplot(aes(x = partyid)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 90))
+# grouped by strength of affiliation  to party with non answers first independent
+# in the middle and republican strength first.
+levels(gss_cat$relig)
+gss_cat %>%
+  ggplot(aes(x = relig)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 90))
+# arbitrary no ordering
+levels(gss_cat$denom)
+gss_cat %>%
+  ggplot(aes(x = denom)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 90))
+# arbitrary no ordering
+
+# 3.
+
+#because the axis was in decreasing order from the last to the first
+
+### Modifying Factor Levels
+
