@@ -1018,9 +1018,9 @@ gss_cat %>%
 # order by increasing number
 levels(gss_cat$rincome)
 gss_cat %>%
-  ggplot(aes(x = rincome)) +
+  ggplot(aes(x = fct_relevel(rincome, "Not applicable"))) +
   geom_bar() +
-  theme(axis.text.x=element_text(angle = 90))
+  coord_flip()
 # principled order in decreasing income level,
 # not applicable likely refers to retired persons and so is different from other
 # non responses but still should be grouped with them in front.
@@ -1050,3 +1050,38 @@ gss_cat %>%
 
 ### Modifying Factor Levels
 
+# Exercises
+
+# 1.
+gss_cat %>%
+  select(year, partyid) %>%
+  mutate(partyid = fct_collapse(partyid,
+                              other = c("No answer", "Don't know", "Other party"),
+                              rep = c("Strong republican", "Not str republican"),
+                              ind = c("Ind,near rep", "Independent", "Ind,near dem"),
+                              dem = c("Not str democrat", "Strong democrat"))) %>%
+  group_by(year,partyid) %>%
+  count() %>%
+  group_by(year) %>%
+  mutate(prop = n / sum(n)) %>%
+  ggplot(aes(x = year, y = prop, color = fct_reorder2(partyid, year, prop))) +
+  geom_line() +
+  geom_point() +
+  scale_colour_manual(values = c("rep" = "red", "dem" = "blue",
+                                 "ind" = "orange", "other" = "green")) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+  labs(color = "PartyID")
+
+
+# 2.
+levels(gss_cat$rincome)
+gss_cat %>%
+  select(rincome) %>%
+  mutate(rincome = fct_collapse(rincome,
+                               '< $10,000' = c('Lt $1000', '$1000 to 2999',
+                                               '$3000 to 3999', '$4000 to 4999',
+                                               '$5000 to 5999', '$6000 to 6999',
+                                               '$7000 to 7999', '$8000 to 9999'))) %>%
+  ggplot(aes(x = fct_relevel(rincome, "Not applicable"))) +
+  geom_bar() +
+  coord_flip()
