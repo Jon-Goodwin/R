@@ -1085,3 +1085,161 @@ gss_cat %>%
   ggplot(aes(x = fct_relevel(rincome, "Not applicable"))) +
   geom_bar() +
   coord_flip()
+
+
+### Dates with lubridate
+
+# Excercises
+
+# 1.
+
+ymd(c("2010-10-10", "bananas"))
+# Get NA and a warning message failed to parse.
+
+# 2.
+
+#tz gives the current time of the specified time zone.
+
+today(tz = "GMT")
+
+# 3.
+d1 <- "January 1, 2010"
+d2 <- "2015-Mar-07"
+d3 <- "06-Jun-2017"
+d4 <- c("August 19 (2015)", "July 1 (2015)")
+d5 <- "12/30/14" # Dec 30, 2014
+
+mdy(d1)
+ymd(d2)
+dmy(d3)
+mdy(d4)
+mdy(d5)
+
+### Date-Time Components
+
+#
+flights_dt <- flights %>%
+  filter(!is.na(dep_time), !is.na(arr_time)) %>%
+  mutate(
+    dep_time = make_datetime_100(year, month, day, dep_time),
+    arr_time = make_datetime_100(year, month, day, arr_time),
+    sched_dep_time = make_datetime_100(
+      year, month, day, sched_dep_time
+    ),
+    sched_arr_time = make_datetime_100(
+      year, month, day, sched_arr_time
+    )
+  ) %>%
+  select(origin, dest, ends_with("delay"), ends_with("time"))
+
+# Excercises
+
+# 1.
+flights_dt %>%
+  mutate(dep_hour = update(sched_dep_time, yday = 1)) %>%
+  ggplot(aes(dep_hour)) +
+  geom_freqpoly(binwidth = 300) +
+  facet_wrap(~month(dep_time))
+
+# The distributions all seem fairly similar
+
+# 2.
+flights_dt %>%
+  filter(!is.na(dep_delay) & !is.na(arr_delay)) %>%
+  mutate(difference = difftime(dep_time,sched_dep_time, units = "min")) %>%
+  select(dep_time, sched_dep_time, dep_delay, difference) %>%
+  filter(dep_delay != difference)
+# dep_delay seems to indicate the plane departed on the next day, but dep_time
+# does not account for that.
+make_datetime_100 <- function(year, month, day, time) {
+  make_datetime(year, month, day, time %/% 100, time %% 100)
+}
+# 3.
+flights_dt %>%
+  filter(!is.na(dep_delay) & !is.na(arr_delay)) %>%
+  mutate(flight_time = as.numeric(arr_time-dep_time),
+         difference = (flight_time - air_time)) %>%
+  select(air_time, difference, flight_time, dep_time, arr_time)
+
+
+# air_time will not account for the time the plane spends on the ground waiting
+# however this should imply that all planes spend less time in the air then the
+# total flight time, which is untrue.
+
+# 4.
+flights_dt %>%
+  filter(!is.na(dep_delay) & !is.na(arr_delay)) %>%
+  mutate(dep_hour = hour(sched_dep_time)) %>%
+  group_by(dep_hour) %>%
+  summarize(avg_delay = mean(dep_delay)) %>%
+  ggplot(aes(x = dep_hour, y = avg_delay)) +
+  geom_point()
+# the average delayseems to increase over the course of the day. sched_dep_time
+# should be used since this will track the delay of flights from their actual 
+# schedule.
+
+# 5.
+flights_dt %>%
+  filter(!is.na(dep_delay) & !is.na(arr_delay)) %>%
+  mutate(dep_day = wday(sched_dep_time, label = T)) %>%
+  group_by(dep_day) %>%
+  summarize(avg_delay = mean(dep_delay)) %>%
+  ggplot(aes(x = dep_day, y = avg_delay)) +
+  geom_bar(stat = "identity")
+# Saturday seems to have less delays
+
+# 6.
+diamonds %>%
+  ggplot(aes(x = carat)) + 
+  geom_density()
+flights_dt %>%
+  mutate(dep_time = update(sched_dep_time, yday = 1)) %>%
+  ggplot(aes(x = dep_time)) +
+  geom_density()
+flights_dt %>%
+  mutate(dep_time = minute(sched_dep_time)) %>%
+  ggplot(aes(x = dep_time)) +
+  geom_density()+
+  scale_x_continuous(breaks = seq(10, 60, by = 10))
+# there are jumps in the carat of a diamond at nice fractions like 1/2, 1/4, 1, etc.
+
+# similarly sched_dep_times are mostly every half hour or 15min
+
+### Time Spans
+
+# Excercises
+
+# 1.
+# minutes, hours, weeks, years, all have standard numbers of seconds. But different
+# months have different numbers of days and thus different numbers of seconds
+# Though lubridate does now seem to have dmonths()
+dmonths(1)
+# seems to be an average of the number of seconds in each month.
+
+# 2.
+
+#days(overnight * 1) overnight is true or false depending on whether the flight
+# had an arr_time earlier then the dep_time. In R when a result is FALSE it has
+# an integer value of 0 and thus 0*1 == 0 and so days(overnight * 1) == 0 and adds
+# no days since the flight was not overnight. However if overnight is TRUE then
+# it evalutes to 1 and 1*1 == 1 and so days(overnight * 1) == 1.
+
+# 3.
+start_2015 <- ymd_hms("2015-01-01 00:00:00", tz = "America/New_York")
+
+Labels <- rep(0, 12)
+for(i in 0:11){
+    Labels[i+1] = wday(start_2015 + months(i), label = T )
+}
+
+# 4.
+current_age <- function(birthday){
+  (birthday %--% today()) %/% years(1)
+}
+
+# 5.
+# Its not clear what the problem is besides the missing paranthesis
+# since adding years(1) should always add 12 months and then the interval will
+# always be 12 months.
+
+(today() %--% (today() + years(1))) / months(1)
