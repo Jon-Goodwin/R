@@ -221,3 +221,70 @@ switch("e",
 
 # Excercises
 
+# 1.
+# commas(letters, collapse = "-") causes an error, since the "..." argument passes
+# both letters and collapse = "-" to str_c(..., collapse = ", ")
+
+# 2.
+rule("Title", pad = "-+")
+# the problem is the length of pad has increased but the function 
+
+rule <- function(..., pad = "-") {
+  title <- paste0(...)
+  width <- (getOption("width") - nchar(title) - 5)/str_length(pad)
+  cat(title, " ", stringr::str_dup(pad, width), "\n", sep = "")
+}
+
+# implicitly assumes the length of pad to be 1, here I've divided the original
+# width by the sstr_length of pad.
+
+# 3.
+x <- c(0,2,5,7,8,10,100,1000)
+
+mean(x, trim = 0.5)
+
+(5+7+8+10)/4
+# trim, removes a proportion of the input vector from each end of the range. So
+# at trim = 0.5, it removes the top 0.25 and bottom 0.25.
+
+# 4.
+# the method argument chooses the method to compute the correlation coefficient
+# Pearson is the default computes the linearity of responses, while spearman 
+# calculatures monotonicity
+
+### Return Values
+
+## Excercises
+
+# 1.
+# By the documentation is.finite() returns elements which are 
+# (not infinite and not missing), where is.infinite() returns True only for Inf 
+# and -Inf thus NA returns TRUE for !is.infinite(NA) and is.finite(NA) returns
+# FALSE since NA means missing is not considered finite and is not infinite.
+
+# 2.
+# .Machine$double.eps^0.5 is the smallest possible floating point number that 
+# 1 + x != 1, thus abs(x-y) <.Machine$double.eps^0.5 returns TRUE only if the
+# distance from x to y is smaller then this precision. So near() essentially tells
+# you that x and y are at least this close.
+
+# 3.
+# Largest number of possible distinct values is 2^32 since R uses 32-bit 
+# representation for integers. One of these is NA_integer and one is used for the
+# sign of the integer, +/-
+# for dbls R has 64-bit representation and so has 2^64 different values possible
+# one of them is NA_real_
+
+# 4.
+
+f <- function(x){
+  as.integer(x)
+}
+# I'm not sure how else you could do this, some have interpreted this simply as 
+# rounding a double to it's nearest integer value
+
+# 5.
+#parse_logical, parse_integer and parse_double
+
+### Using Atomic Vectors
+
