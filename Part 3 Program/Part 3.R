@@ -288,3 +288,17 @@ f <- function(x){
 
 ### Using Atomic Vectors
 
+# Excercises
+
+# 1.
+# mean(is.na(x)) gives the proportion of NA values in x
+mean(is.na(x))
+# Gives the number of non finite members of x.
+sum(!is.finite(x))
+
+# 2.
+# is.vector(x) will return FALSE if x has attributes other then names.
+# is.atomic(x) is TRUE if x is any of the atomic types or NULL
+is.atomic(NULL)
+
+# 3.
