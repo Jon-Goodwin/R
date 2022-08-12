@@ -302,3 +302,116 @@ sum(!is.finite(x))
 is.atomic(NULL)
 
 # 3.
+#set_names() is equivalent to setNames() for most purposes but has some extended features
+# for example, it will supply characters for names if no name argument is provided
+x <- c(1,2,3)
+setNames(x)
+set_names(x)
+
+# 4.
+x <- c(1,2,3)
+x <- set_names(x)
+#a.
+last_value <- function(x){
+  x[[length(x)]]
+}
+# using [ will produce the name and the element contained, we only
+# want the elemnt.
+
+#b.
+x <- 1:10
+even_elements <- function(x){
+  x[1:length(x) %% 2 == 0]
+}
+
+#c.
+x <- 1:10
+all_but_last <- function(X){
+  x[1:length(x)-1]
+}
+
+#d.
+even_numbers <- function(x){
+  x[x %% 2 == 0]
+}
+
+# 5.
+x[-which(x > 0)] # drops the indices corresponding to elements > 0.
+
+x[x <= 0] # subsets the values which correspond to elements <= 0
+
+# 6.
+x <- -5:10
+x[1000]
+x <- set_names(x)
+x["name"]
+# subsetting with an index that doesnt exist results in NA and so does subsetting
+# using a name that is not in the vector.
+
+### Recursive Vectors(Lists)
+
+# Excercises
+
+# 1.
+# Drawing
+
+# 2.
+x <- tibble(x = c(1,2,3), y = c(1,2,3))
+y <- list(x = c(1,2,3), y= c(1,2,3))
+# a list doesn't have dimension so subsetting such as y[1,1] doesn't have meaning
+# and returns an error
+x[1,1]
+y[1,1]
+# the main difference is that tibbles must have columns of the same length where
+# lists can have elements of differing length, tibbles can however have elements
+# that have different lengths within their own elements, like x_diff
+x <- tibble(x = c(1,2,3), y = c(1,2))
+x_diff <- tibble(x = c(1,2,3), y = list(list(1,2),2,3))
+y <- list(x = c(1,2,3), y= c(1,2))
+typeof(x) # shows a tibble is actually a list.
+### Attributes
+
+### Augmented Vectors
+
+# Excercises
+
+# 1.
+x <- hms::hms(3600)
+# prints as 01:00:00
+typeof(x)
+# type iss a double
+attributes(x)
+# > attributes(x)
+# $units
+# [1] "secs"
+# 
+# $class
+# [1] "hms"      "difftime"
+
+# 2.
+y <- tibble(x = c(1,2,3), y = c(1,2))
+# > y <- tibble(x = c(1,2,3), y = c(1,2))
+# Error:
+#   ! Tibble columns must have compatible sizes.
+# • Size 3: Existing data.
+# • Size 2: Column `y`.
+# ℹ Only values of size one are recycled.
+# Run `rlang::last_error()` to see where the error occurred.
+
+# 3.
+y <- tibble(x = c(1,2,3), list(1,2,3))
+# No there is nothing wrong with having a list as a column as long as the list is
+# of the correct length, or else an error occurs as below:
+# > y <- tibble(x = c(1,2,3), list(1,2,3,3))
+# Error:
+#   ! Tibble columns must have compatible sizes.
+# • Size 3: Existing data.
+# • Size 4: Column at position 2.
+# ℹ Only values of size one are recycled.
+# Run `rlang::last_error()` to see where the error occurred.
+
+### Iteration with purrr
+
+### For Loops
+
+# Excercises
