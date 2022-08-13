@@ -415,3 +415,170 @@ y <- tibble(x = c(1,2,3), list(1,2,3))
 ### For Loops
 
 # Excercises
+
+# 1.
+# a.
+mean_mtcars <- vector("double", ncol(mtcars))
+names(mean_mtcars) <- names(mtcars)
+for (i in seq_along(mtcars)){
+  mean_mtcars[i] <- mean(mtcars[[i]])
+}
+mean_mtcars
+
+#b.
+types_flights <- vector("character", ncol(flights))
+names(types_flights) <- names(flights)
+for(i in seq_along(flights)){
+  types_flights[i] <- class(flights[[i]])
+}
+types_flights
+
+# c.
+unique_values <- vector("double", ncol(iris))
+names(unique_values) <- names(iris)
+for (i in seq_along(iris)){
+  unique_values[i] <- nrow(unique(iris[i]))
+}
+unique_values
+
+# d.
+n <- 10
+normals <- c(-10,0,10,100)
+x <- vector("double", n)
+rand_normals <- list(x,x,x,x)
+names(rand_normals) <- names(set_names(normals))
+for (i in seq_along(normals)){
+  rand_normals[[i]] <- rnorm(n, mean = normals[i])
+}
+
+# 2.
+out <- ""
+for (x in letters) {
+  out <- stringr::str_c(out, x)
+}
+# alternative
+str_c(letters, collapse = "")
+
+x <- sample(100)
+sd <- 0
+for (i in seq_along(x)) {
+  sd <- sd + (x[i] - mean(x)) ^ 2
+}
+sd <- sqrt(sd / (length(x) - 1))
+# alternative
+SSE <- sum((x-mean(x))^2)
+s_dev <- sqrt(SSE/(length(x)-1))
+
+x <- runif(100)
+out <- vector("numeric", length(x))
+out[1] <- x[1]
+for (i in 2:length(x)) {
+  out[i] <- out[i - 1] + x[i]
+}
+#alternative
+cumsum(x)
+
+# 3.
+alice_the_camel <- function(n){
+  a = c(n:1,"no")
+  Go <- "So go, Alice, go!"
+  Boom <- "Boom, boom, boom, boom!"
+  Horse <- "'Cause Alice is a horse, of course!"
+  for (i in seq_along(a)){
+    replicate(3, print(str_c("Alice the camel has ", as.character(a[i]), " humps.")))
+    print(Go)
+    if (i != length(a)){
+      print(Boom)
+    } else {print(Horse)}
+  }
+}
+
+ten_in_the_bed <- function(n = 10, s = "bed"){
+  a <- as.character(n:1)
+  Little <- "And the little one said,"
+  Roll_over <- "Roll over! Roll over!"
+  Falls_out <- "So they all rolled over and one fell out"
+  for (i in seq_along(a)){
+    print(str_c("There ", ifelse(i != length(a), "were ", "was "),
+                a[i]," in the ", s))
+    print(Little)
+    if (i != length(a)){
+      print(Roll_over)
+      print(Falls_out)
+    } else{
+      print("Alone at last!")
+      print("Good Night!")
+      }
+  }
+}
+
+bottles_of_beer <- function(n = 99, vessel = "bottle", liquid = "beer",
+                            surface = "wall"){
+  a <- c(n:1,"no")
+  for (i in seq_along(a)) {
+    if (i < length(a)-1){
+    repeater <- str_c(a[i]," ",vessel,"s"," of ", liquid)
+    cat(str_c(repeater, " on the ", surface, ", ", repeater,".\n"))
+    cat(str_c("Take one down and pass it around, ", a[i+1], " ", vessel, "s",
+              " of ", liquid, " on the ", surface, ".\n"))
+    }
+    else if (i == length(a)-1){
+      repeater <- str_c(a[i]," ",vessel," of ", liquid)
+      cat(str_c(repeater, " on the ", surface, ", ", repeater,".\n"))
+      cat(str_c("Take one down and pass it around, no more ", vessel, "s",
+                " of ", liquid, " on the ", surface, ".\n"))
+    }
+    else {
+      cat(str_c("No more ",vessel,"s", " of ", liquid, " on the ", surface,
+                " no more ", vessel, "s", " of ", liquid, ".\n"))
+      cat("Go to the store and buy some more, ", a[1], vessel, "s", " of ", liquid,
+          " on the ", surface)
+      }
+  }
+}
+
+# 4.
+fun_1 <- function(n){
+  x = sample(n)
+  output <- vector("integer", 0)
+  for (i in seq_along(x)) {
+    output <- c(output, lengths(x[[i]]))
+  }
+  output
+}
+fun_2 <- function(n){
+  x <- sample(n)
+  output_2 <- vector("integer", length(x))
+  for (i in seq_along(x)) {
+    output_2[i] <- lengths(x[[i]])
+}
+output_2
+}
+microbenchmark(fun_1(10000),fun_2(10000), times = 5)
+
+### For Loop Variations
+
+#Excercises
+
+# 1.
+files <-
+  dir(getwd(), pattern = "\\.csv$", full.names = TRUE)
+data <- vector("list", length(files))
+for (i in seq_along(files)){
+  data[[i]] <- read_csv(files[[i]], show_col_types = FALSE)
+}
+bind_rows(data)
+
+# 2.
+i = 0
+x <- c(1,2,3)
+for (nm in names(x)) {i + i+1}
+# return i = 0, nothing happens because names(x) == NULL
+x <- c(a=1,b=2,NA = 3)
+for (nm in names(x)) {i + i+1}
+# returns 3 since names(x) gives
+# > names(x)
+# [1] "a" "b" "" 
+# the name of the unnamed variable
+
+# 3.
