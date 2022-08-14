@@ -643,4 +643,71 @@ c(-10,0,10,100) %>%
 vec <- map_lgl(iris, is.factor)
 
 # 3.
+set.seed(1)
 map(1:5, runif)
+# randomly samples 1,2,3,4,5 from a distribution U(0,1). 1:5 is being used for the
+# first argument of runif, n.
+set.seed(1); map(list(rep(1,5)), runif) # alters to a list containing 1 vector of length 5.
+set.seed(1); map(5, runif) # runif treats 1:5 as taking n = 5.
+
+# 4.
+# Consider
+map(-2:2, ~ {
+  set.seed(1)
+  rnorm(n=5, mean = .x)
+})
+# gives the list of vectors rnorm(-2, n = 5), rnorm(-1, n= 5) where -2:2 is being
+# applied to the next available argument, mean.
+map_dbl(-2:2, rnorm, n = 5) #produces an error because map_dbl returns an atomic vector
+map_dbl(-2:2, rnorm, n = 1) # produces an atomic vector of length 5 where each element
+# corresponds to iterating over -2:2 for the mean.
+
+# 5.
+lin_m <- function(df) lm(mpg ~ wt, data = df)
+x <- mtcars %>%
+  split(.$cyl)
+map(x, lin_m)
+# Not sure if this is what was meant, the only other way would be to do what was done
+# in the text using this example
+models <- mtcars %>%
+  split(.$cyl) %>%
+  map(~lm(mpg ~ wt, data = .))
+
+### Other Patterns of For Loops
+
+# Excercises
+
+# 1.
+for_all <- function(x, fun, ...){
+  vec <- vector("logical", length(x))
+  for(i in seq_along(x)){
+    vec[i] <- fun(x[[i]], ...)
+  }
+  all(vec)
+}
+# for_all seems to agree for every test I can think of.
+
+# 2.
+col_sum <- function(df, fun, ...){
+  data <- df %>%
+    keep(is.numeric)
+  map_dbl(data,fun, ...)
+}
+
+# 3.
+col_sum3 <- function(df, f) {
+  is_num <- sapply(df, is.numeric)
+  df_num <- df[, is_num]
+  sapply(df_num, f)
+}
+df <- tibble(
+  x = 1:3,
+  y = 3:1,
+  z = c("a", "b", "c")
+)
+col_sum3(df[1:2], mean)
+col_sum3(df[1], mean)
+col_sum3(df[0], mean)
+# Unlear what the bugs are supposed to be
+
+# 4.
