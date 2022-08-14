@@ -612,4 +612,35 @@ for (var in names(trans)) {
 
 ### For Loops Versus Functionals
 
+# Excercises
 
+# 1.
+# By the documentation apply generalizes the use of column and row indices as well
+# as being able to select dimension names in the MARGIN arugment.
+
+# 2.
+col_summary <- function(df, fun) {
+  y <- df[,apply(df,2,is.numeric)]
+  out <- vector("double", length(y))
+  for (i in seq_along(y)) {
+    out[i] <- fun(y[[i]])
+  }
+  out
+}
+
+### The Map Functions
+
+# Excercises
+
+# 1.
+map_dbl(mtcars, mean)
+map_chr(flights, typeof)
+map(iris,unique) %>% map_dbl(length)
+c(-10,0,10,100) %>%
+  map(rnorm, n=10)
+
+# 2.
+vec <- map_lgl(iris, is.factor)
+
+# 3.
+map(1:5, runif)
