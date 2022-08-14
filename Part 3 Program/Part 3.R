@@ -582,3 +582,34 @@ for (nm in names(x)) {i + i+1}
 # the name of the unnamed variable
 
 # 3.
+show_means <- function(x){
+  y <- x[,sapply(x,is.numeric)]
+  y <- sapply(y,mean)
+  y <- round(y, digits = 3)
+  names <- names(y)
+  for (i in seq_along(y)){
+    cat(str_c(str_pad(str_c(names[i],":"), 14, "right"),y[[i]]), sep = "\n")
+  }
+}
+# I used str_pad to get the width correct
+
+# 4.
+trans <- list(
+  disp = function(x) x * 0.0163871,
+  am = function(x) {
+    factor(x, labels = c("auto", "manual"))
+  }
+)
+for (var in names(trans)) {
+  mtcars[[var]] <- trans[[var]](mtcars[[var]])
+}
+# trans is a list of functions, disp and am. disp multiplies the argument by
+# 0.0163871 and am creates a factor with levels "auto" and "manual"
+# the loop is over the names of trans, "disp" and "am" so when at "disp"
+# trans[[disp]] gives the argument mtcars[[disp]] to the function disp inside trans.
+# similarly for "am". the function multiplies the displacement and converts the
+# values of the am, 1 for auto, 0 for manual to characters.
+
+### For Loops Versus Functionals
+
+
