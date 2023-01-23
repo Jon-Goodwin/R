@@ -371,6 +371,8 @@ d_8 <- daily_7 %>%
 ## gapminder
 
 # Excercises
+library(modelr)
+library(tidyverse)
 
 # 1.
 # The only change here is changing the function so that year is a polynomial
