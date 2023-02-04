@@ -373,16 +373,45 @@ d_8 <- daily_7 %>%
 # Excercises
 library(modelr)
 library(tidyverse)
+library(gapminder)
 
-# 1.
-# The only change here is changing the function so that year is a polynomial
-country_model <- function(df) {
-  lm(lifeExp ~ poly(year - mean(year),2), data = df)
-}
+gapminder %>%
+  ggplot(aes(year, lifeExp, group = country)) +
+  geom_line(alpha = 1/3)
+
+nz <- filter(gapminder, country == "New Zealand")
+
+nz %>%
+  ggplot(aes(year, lifeExp))+
+  geom_line() +
+  ggtitle("Full data = ")
+
+nz_mod <- lm(lifeExp ~ year, data = nz)
+nz %>%
+  add_predictions(nz_mod) %>%
+  ggplot(aes(year, pred)) +
+  geom_line() +
+  ggtitle("Linear trend +")
+
+nz %>%
+  add_residuals(nz_mod) %>%
+  ggplot(aes(year, resid)) +
+  geom_hline(yintercept = 0, color = "white", size = 3) +
+  geom_line() +
+  ggtitle("Remaining pattern")
+
+### Shows the training error of the linear model
+### compared to the actual data.
 
 by_country <- gapminder %>%
   group_by(country, continent) %>%
   nest()
+
+country_model <- function(df) {
+  lm(lifeExp ~ year, data = df)
+}
+
+models <- map(by_country$data, country_model)
 
 by_country <- by_country %>%
   mutate(model = map(data, country_model))
@@ -398,23 +427,90 @@ resids %>%
   ggplot(aes(year, resid)) +
   geom_line(aes(group = country), alpha = 1 / 3) +
   geom_smooth(se = FALSE)
+
+resids %>%
+  ggplot(aes(year, resid, group = country)) +
+  geom_line(alpha = 1 / 3) +
+  facet_wrap(~continent)
+
+### Model Quality
+
+broom::glance(nz_mod)
+
+by_country %>%
+  mutate(glance = map(model, broom::glance)) %>%
+  unnest(glance)
+
+glance <- by_country %>%
+  mutate(glance = map(model, broom::glance)) %>%
+  unnest(glance, .drop = TRUE) %>%
+  select(-data, -model, -resids)
+
+glance %>%
+  arrange(r.squared)
+
+glance %>%
+  ggplot(aes(continent, r.squared)) +
+  geom_jitter(width = 0.5)
+## relatively small number of observations
+## and a discrete variable so using jitter
+
+
+bad_fit <- filter(glance, r.squared < 0.25)
+
+gapminder %>%
+  semi_join(bad_fit, by = "country") %>%
+  ggplot(aes(year, lifeExp, color = country)) +
+  geom_line()
+
+# 1.
+# The only change here is changing the function so that year is a polynomial
+country_model_poly <- function(df) {
+  lm(lifeExp ~ poly(year - mean(year),2), data = df)
+}
+
+by_country_poly <- gapminder %>%
+  group_by(country, continent) %>%
+  nest()
+
+by_country_poly <- by_country_poly %>%
+  mutate(model = map(data, country_model_poly))
+
+by_country_poly <- by_country_poly %>%
+  mutate(
+    resids = map2(data, model, add_residuals)
+  )
+
+resids_poly <- unnest(by_country_poly, resids)
+
+resids_poly %>%
+  ggplot(aes(year, resid)) +
+  geom_line(aes(group = country), alpha = 1 / 3) +
+  geom_smooth(se = FALSE)
 # This does seem better
 
 # 2.
+library(ggbeeswarm)
 
-glance2 <- by_country %>%
-  mutate(glance = map(model, broom::glance)) %>%
-  unnest(glance, .drop = T)
-glance2 %>%
-  dplyr::select(-data,-model,-resids) %>%
-  arrange(r.squared)
-glance2 %>%
-  ggplot(aes(x = continent, y = r.squared, color = continent)) +
+glance %>%
+  ggplot(aes(continent, r.squared)) +
+  geom_boxplot()
+
+glance %>%
+  ggplot(aes(continent, r.squared)) +
   geom_quasirandom()
+
+glance %>%
+  ggplot(aes(continent, r.squared)) +
+  geom_violin()
+
+glance %>%
+  ggplot(aes(continent, r.squared)) +
+  geom_beeswarm()
 
 # 3.
 
-bad_fit <- filter(glance2, r.squared < 0.50)
+bad_fit <- filter(glance, r.squared < 0.25)
 gapminder %>%
   group_by(country, continent) %>%
   nest() %>%
@@ -422,14 +518,14 @@ gapminder %>%
   mutate(resids = map2(data, model, add_residuals)) %>%
   mutate(glance = map(model, broom::glance)) %>%
   unnest(glance) %>%
-  filter(r.squared < 0.7) %>%
+  filter(r.squared < 0.25) %>%
   unnest(data) %>%
   ggplot(aes(year, lifeExp, color = country)) +
   geom_line()
 # I've got less countries with small r.squared now since the model used is improved
-# however the process is the same. In fact, since .drop has been deprecated this
+# however the process is the same. Since .drop has been deprecated this
 # question is somewhat redundant.
 
 ### List Columns
 
-### Creating List Columns #test commit
+### Creating List Columns
