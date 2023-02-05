@@ -1,0 +1,38 @@
+---
+title: "Communicate"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+date: "2023-02-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r by-name, echo = F, message = F}
+library(tidyverse)
+cars %>%
+  ggplot(aes(speed,dist))+geom_point()
+
+```
+
+```{r echo = F}
+knitr::kable(
+mtcars[1:5, ],
+caption = "A knitr kable."
+)
+```
+
+
+
+
+## R Markdown
+
+This would be a block quote. Generally, block quotes are used to indicate
+quotes longer than a three or four lines
+
+^[This sentence will be printed as a footnote.]
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
