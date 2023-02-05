@@ -529,3 +529,89 @@ gapminder %>%
 ### List Columns
 
 ### Creating List Columns
+df.l <- data.frame(x = list(1:3, 3:5))
+
+tibble(
+  x = list(1:3, 3:5),
+  y = c("1, 2", "3, 4, 5")
+)
+
+### Creating List- Columns
+
+## Methods to create list columns
+
+# 1. With nest()
+
+# 2.with mutate()
+
+# 3. with summarize()
+
+probs <- c(0.01, 0.25, 0.5, 0.75, 0.99)
+
+mtcars %>%
+  group_by(cyl) %>%
+  summarize(p = list(probs), q = list(quantile(mpg, probs))) %>%
+  unnest()
+
+df %>%
+  mutate(
+    smry = map2_chr(
+      name,
+      value,
+      ~ stringr::str_c(.x, ": ", .y[1])
+    )
+  )
+
+#### Excercises List-Columns
+
+# 1.
+# quantil() function, map() function, str_split()
+
+# 2.
+# range(), fivenum()
+
+# 3.
+
+mtcars %>%
+  group_by(cyl) %>%
+  summarize(q = list(quantile(mpg))) %>%
+  unnest(q)
+
+# Does not return the names
+
+mt.q <- mtcars %>%
+  group_by(cyl) %>%
+  summarize(q = list(quantile(mpg)))
+
+names(mt.q[[1,2]][[1]])
+
+# 4.
+mtcars %>%
+  group_by(cyl) %>%
+  summarize_each(funs(list))
+
+# it makes list columns of all other variables for
+# each cylinder group
+
+### Simplifying List-Columns
+
+df <- tribble(
+  ~x,
+  letters[1:5],
+  1:3,
+  runif(5)
+)
+
+### Excercises Simplifying List-columns
+
+# 1.
+# length() can be used to verify the length of the list column
+#
+
+# 2. 
+# integer, character, logical, factor. The bigegst difference
+# is that the most common vector has length 1, and lists
+# typically do not.
+
+#### Making Tidy Data with broom
+
