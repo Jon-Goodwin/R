@@ -1,0 +1,111 @@
+---
+title: "Jonathan Goodwin"
+author: Jonathan Goodwin
+date: "`r Sys.Date()`"
+output:
+  pagedown::html_resume:
+    # set it to true for a self-contained HTML page but it'll take longer to render
+    self_contained: false
+# uncomment this line to produce HTML and PDF in RStudio:
+#knit: pagedown::chrome_print
+---
+
+Aside
+================================================================================
+
+
+![Jonathan Goodwin](https://avatars1.githubusercontent.com/u/895125?s=400&v=4){width=80%}
+
+
+Contact Info {#contact}
+--------------------------------------------------------------------------------
+
+- <i class="fa fa-envelope"></i> jon.goodwin@mail.utoronto.ca
+- <i class="fa fa-github"></i> [github.com/Jon-Goodwin](https://github.com/Jon-Goodwin)
+- <i class="fa fa-phone"></i> 519-584-4663
+- For more information, please contact me via email.
+
+
+Disclaimer {#disclaimer}
+--------------------------------------------------------------------------------
+
+This resume was made with the R package [**pagedown**](https://github.com/rstudio/pagedown).
+
+Last updated on `r Sys.Date()`.
+
+
+
+Main
+================================================================================
+
+Jonathan Goodwin {#title}
+--------------------------------------------------------------------------------
+
+### Seeking career which utilizing my skills in data analysis, 
+
+
+Education {data-icon=graduation-cap data-concise=true}
+--------------------------------------------------------------------------------
+
+### University of Toronto
+
+HBSc in Mathematics and Statistics
+
+N/A
+
+2022
+
+Projects {data-icon=file}
+--------------------------------------------------------------------------------
+
+### R Shiny Dashboard
+
+Analysis and visualizations for the availability of water in Jordan.
+Link:[github.com/Jon-Goodwin](https://github.com/Jon-Goodwin)
+
+N/A
+
+N/A
+
+
+
+### Analysis of CDC Data on American Physical Fitness
+
+Conducted Analysis on the relation between access to public parks and physical.
+Including construction of a model for inference.
+
+
+N/A
+
+### Analysis of Water conservation in Jordan
+
+Analysis and visualizations for the availability of water in Jordan.
+
+N/A
+
+N/A
+
+
+
+### Analysis of CDC Data on American Physical Fitness
+
+Conducted Analysis on the relation between access to public parks and physical.
+Including construction of a model for inference.
+
+
+N/A
+
+
+
+Skills {#skills}
+--------------------------------------------------------------------------------
+
+### Languages and Programs
+
+PostgreSQL, Google Sheets, Excel, R and Python
+
+N/A
+
+### Activities
+
+Data Analysis, Visualization, Dashboards, VLookup, Pivot Tables, Scripting.
