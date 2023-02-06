@@ -1,38 +1,85 @@
 ---
 title: "Communicate"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 date: "2023-02-05"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r by-name, echo = F, message = F}
-library(tidyverse)
-cars %>%
-  ggplot(aes(speed,dist))+geom_point()
-
-```
-
-```{r echo = F}
-knitr::kable(
-mtcars[1:5, ],
-caption = "A knitr kable."
-)
+knitr::opts_chunk$set(echo = F)
+library("tidyverse")
+library(knitr)
+comma <- function(x) format(x, digits = 2, big.mark = ",")
 ```
 
 
+### Analysis of Diamond Data
+
+```{r}
+diamonds %>%
+  mutate(volume = x*y*z) %>%
+  filter(volume < 1000) %>%
+  ggplot(aes(x = as.factor(cut), y = volume))+geom_boxplot()
+diamonds %>%
+  mutate(volume = x*y*z) %>%
+  filter(volume < 1000) %>%
+  ggplot(aes(x = as.factor(color), y = volume))+geom_boxplot()
+diamonds %>%
+  mutate(volume = x*y*z) %>%
+  filter(volume < 1000) %>%
+  ggplot(aes(x = as.factor(clarity), y = volume))+geom_boxplot()
+```
+
+### Largest Diamonds
+
+```{r, results = "asis"}
+larger_diamonds <- diamonds %>%
+  arrange(-carat) %>%
+  slice(1:20) %>%
+  knitr::kable(
+    caption = "The 20 largest diamonds by carat weight."
+  )
+```
+
+The table include `r comma(nrow(diamonds))` diamonds
+
+```{r}
+l_diamonds <- diamonds %>%
+  filter(carat > 2.5) %>%
+  count()
+total_diamonds <- diamonds %>%
+  count()
+perc_l_diamonds <- (l_diamonds/total_diamonds)*100
+```
+
+Large diamonds of greater than 2.5 carat make up `r comma(perc_l_diamonds)`% of the
+entire dataset
+
+```{r a, cahe = T}
+print(lubridate::now())
+x <- 1
+x
+```
 
 
-## R Markdown
+```{r b, cache = T, dependson = "a"}
+print(lubridate::now())
+y <- x + 1
+y
+```
 
-This would be a block quote. Generally, block quotes are used to indicate
-quotes longer than a three or four lines
 
-^[This sentence will be printed as a footnote.]
+```{r c, cache = T, dependson = "a"}
+print(lubridate::now())
+z <- x + 2
+z
+```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r d, cache = T, dependson = c("c","b")}
+print(lubridate::now())
+w <- z + y + 1
+w
+```
+
