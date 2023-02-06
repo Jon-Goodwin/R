@@ -172,9 +172,163 @@ ggplot(mpg, aes(displ, hwy)) +
 
 # 2.
 ?annotate
-ggplot(mpg, aes(displ, hwy)) +
-  geom_point() +
-  annotate("text", x = 6, y = 42,
-           label = "Increasing engine size is \nrelated to decreasing fuel economy.")
 
 # 3.
+
+label <- mpg %>%
+  summarize(
+    displ = max(displ),
+    hwy = max(hwy),
+    label = paste(
+      "text."
+    )
+  )
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  geom_text(aes(label = label,vjust = "center", hjust = "right"),
+  data = label) +
+  facet_wrap(~cyl)
+
+# 4.
+# Fill aesthetic controls background box color.
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class)) +
+  geom_label(
+    aes(label = model),
+    data = best_in_class,
+    nudge_y = 2,
+    alpha = 0.5,
+    fill = "grey"
+  )
+
+# 5.
+?arrow
+# angle, length, ends, type
+mpg %>%
+  ggplot(aes(x = hwy, y = displ)) +
+  geom_point() +
+  geom_segment(aes(x = 20, y = 5.5, xend = 30, yend = 3), 
+                           arrow = arrow(length = unit(0.5, 'cm')))
+
+### Scales
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class))
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class)) +
+  scale_x_continuous() +
+  scale_y_continuous() +
+  scale_color_discrete()
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  scale_x_continuous(labels = NULL) +
+  scale_y_continuous(labels = NULL)
+
+presidential %>%
+  mutate(id = 33 + row_number()) %>%
+  ggplot(aes(start, id)) +
+  geom_point() +
+  geom_segment(aes(xend = end, yend = id)) +
+  scale_x_date(
+    NULL,
+    breaks = presidential$start,
+    date_labels = "'%y"
+  )
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = drv))
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = drv)) +
+  scale_color_brewer(palette = "Set1")
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = drv, shape = drv)) +
+  scale_color_brewer(palette = "Set1")
+
+presidential %>%
+  mutate(id = 33 + row_number()) %>%
+  ggplot(aes(start, id, color = party)) +
+  geom_point() +
+  geom_segment(aes(xend = end, yend = id)) +
+  scale_colour_manual(
+    values = c(Republican = "red", Democratic = "blue")
+  )
+
+
+## Excercises
+
+# 1.
+df <- tibble(
+  x = rnorm(10000),
+  y = rnorm(10000)
+)
+ggplot(df, aes(x, y)) +
+  geom_hex() +
+  scale_color_gradient(low = "white", high = "red") +
+  coord_fixed()
+
+#the color in the plot is using fill not color.
+
+ggplot(df, aes(x, y)) +
+  geom_hex() +
+  scale_fill_gradient(low = "white", high = "red") +
+  coord_fixed()
+
+# 2.
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  scale_x_continuous(name = 'displacement',
+                     breaks = seq(15, 40, by = 5))
+
+# name is the first argument and functions the same as adding a label.
+
+# 3.
+presidential %>%
+  mutate(id = 33 + row_number()) %>%
+  ggplot(aes(start, id, color = party)) +
+  geom_point() +
+  geom_segment(aes(xend = end, yend = id)) +
+  scale_colour_manual(
+    values = c(Republican = "red", Democratic = "blue")
+  )
+
+presidential %>%
+  mutate(id = 33 + row_number(),
+         name_num = fct_inorder(str_c(name, ",",id))) %>%
+  arrange(-id) %>%
+  ggplot(aes(start, name_num, color = party)) +
+  geom_point() +
+  geom_segment(aes(xend = end, yend = name_num)) +
+  scale_y_discrete(NULL) +
+  scale_x_date(NULL,
+               breaks = presidential$start,
+               date_labels = "'%y",
+               minor_breaks = make_date(seq(year(min(presidential$start)),
+                                            year(max(presidential$end)),
+                                            by = 4),1,1)) +
+  scale_colour_manual(
+    values = c(Republican = "red", Democratic = "blue")
+  ) +
+  labs(title = "Presidential Terms",
+       subtitle = "Eisenhower(34th) to Trump(45th)") + 
+  theme(
+    panel.grid.minor = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+# 4.
+ggplot(diamonds, aes(carat, price)) +
+  geom_point(aes(color = cut), alpha = 1/20) + 
+  guides(
+    color = guide_legend(
+      override.aes = list(size = 4, alpha = 1)
+    )
+  )
+
+### Zooming
+
