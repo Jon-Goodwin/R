@@ -332,3 +332,60 @@ ggplot(diamonds, aes(carat, price)) +
 
 ### Zooming
 
+# Generally coord_cartesian() is best for zooming
+
+ggplot(mpg, mapping = aes(displ, hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth() +
+  coord_cartesian(xlim = c(5, 7), ylim = c(10, 30))
+
+mpg %>%
+  filter(displ >= 5, displ <= 7, hwy >= 10, hwy <= 30) %>%
+  ggplot(aes(displ, hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth()
+
+suv <- mpg %>% filter(class == "suv")
+compact <- mpg %>% filter(class == "compact")
+ggplot(suv, aes(displ, hwy, color = drv)) +
+  geom_point()
+ggplot(compact, aes(displ, hwy, color = drv)) +
+  geom_point()
+
+x_scale <- scale_x_continuous(limits = range(mpg$displ))
+y_scale <- scale_y_continuous(limits = range(mpg$hwy))
+col_scale <- scale_color_discrete(limits = unique(mpg$drv))
+
+ggplot(suv, aes(displ, hwy, color = drv)) +
+  geom_point() +
+  x_scale +
+  y_scale +
+  col_scale
+ggplot(compact, aes(displ, hwy, color = drv)) +
+  geom_point() +
+  x_scale +
+  y_scale +
+  col_scale
+
+### Themes
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth(se = FALSE) +
+  theme_bw()
+
+### Saving Plots
+
+ggplot(mpg, aes(displ, hwy)) + geom_point()
+ggsave("my-plot.pdf")
+
+### Figure Sizing
+
+# Five main options for R markdown figure dimensions
+# fig.width, fig.height, fig.asp, out.width and out.height
+
+# fig.show = "hold" renders plots after code blocks.
+
+# dev = "png" can make pltos load faster but slightly lower
+# in quality
+

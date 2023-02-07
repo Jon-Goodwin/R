@@ -1,0 +1,13 @@
+---
+title: "R Notebook"
+output:
+  html_document: default
+runtime: shiny
+---
+
+
+```{r}
+library(shiny)
+textInput("name", "What is your name?")
+numericInput("age", "How old are you?", NA, min = 0, max = 150)
+```
